@@ -50,8 +50,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, metadata, _} = docs_chunk <- docs_chunk(module),
-         true <- config.filter_modules.(module, metadata),
+    with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
          {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config) do
       [generate_node(module, module_data, config)]
@@ -142,7 +141,8 @@ defmodule ExDoc.Retriever do
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
-      annotations: List.wrap(metadata[:tags])
+      annotations: List.wrap(metadata[:tags]),
+      metadata: metadata
     }
   end
 

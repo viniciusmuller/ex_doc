@@ -22,6 +22,26 @@ defmodule ExDoc do
     end
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
+
+    filtered =
+      Enum.map(docs, fn module_node ->
+        filter_status =
+          if config.filter_modules.(module_node.module, module_node.metadata),
+            do: :ok,
+            else: :filtered
+
+        {filter_status, module_node}
+      end)
+      |> Enum.group_by(&elem(&1, 0))
+
+    case Map.fetch(filtered, :filtered) do
+      {:ok, filtered} ->
+        IO.inspect(filtered)
+
+      _ ->
+        :noop
+    end
+
     find_formatter(config.formatter).run(docs, config)
   end
 
